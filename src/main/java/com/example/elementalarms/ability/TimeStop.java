@@ -123,11 +123,6 @@ public final class TimeStop {
 
             e.setDeltaMovement(Vec3.ZERO);
             e.setPos(f.pos.x, f.pos.y, f.pos.z);
-            if (e instanceof LivingEntity living) {
-                living.setXxa(0);
-                living.setYya(0);
-                living.setZza(0);
-            }
             if (e instanceof PrimedTnt tnt && f.fuse >= 0) {
                 tnt.setFuse(f.fuse);
             }
