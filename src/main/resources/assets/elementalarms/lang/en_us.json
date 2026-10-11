@@ -32,6 +32,7 @@
   "mode.elementalarms.stone_sword.rewind": "Rewind",
   "mode.elementalarms.stone_sword.blink": "Reality Blink",
   "mode.elementalarms.stone_sword.singularity": "Singularity",
+  "mode.elementalarms.stone_sword.meteor": "Meteor Shower",
 
   "tooltip.elementalarms.power": "%s",
   "tooltip.elementalarms.use": "Sneak + Right-click: use the selected ability",

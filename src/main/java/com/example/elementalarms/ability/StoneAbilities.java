@@ -2,6 +2,7 @@ package com.example.elementalarms.ability;
 
 import com.example.elementalarms.Config;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -13,8 +14,10 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -358,6 +361,63 @@ public final class StoneAbilities {
         level.sendParticles(ParticleTypes.PORTAL, dest.x, dest.y + 1, dest.z, 40, 0.4, 0.8, 0.4, 0.5);
         level.sendParticles(ParticleTypes.FLAME, dest.x, dest.y + 1, dest.z, 20, 0.4, 0.8, 0.4, 0.1);
         level.playSound(null, dest.x, dest.y, dest.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1.2f);
+        return true;
+    }
+
+    /** Calls down a barrage of meteors (large fireballs) on the area you look at, over about 8 seconds. */
+    public static boolean meteorShower(ServerPlayer player, ServerLevel level) {
+        final Vec3 center = Targeting.resolvePoint(player, 64);
+        if (center == null) {
+            Abilities.fail(player, "no_target");
+            return false;
+        }
+        final double radius = 14;
+        final int meteors = 36;
+        RandomSource rng = level.getRandom();
+
+        level.playSound(null, center.x, center.y, center.z, SoundEvents.ENDER_DRAGON_GROWL, SoundSource.PLAYERS, 3f, 0.6f);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.PLAYERS, 1f, 0.6f);
+
+        // warning ring of flames on the ground before the first meteor lands
+        for (int w = 0; w < 4; w++) {
+            Scheduler.schedule(w * 5, () -> {
+                for (int i = 0; i < 60; i++) {
+                    double a = (i / 60.0) * Math.PI * 2;
+                    level.sendParticles(ParticleTypes.FLAME, center.x + Math.cos(a) * radius, center.y + 0.3,
+                            center.z + Math.sin(a) * radius, 1, 0.1, 0.3, 0.1, 0.02);
+                }
+            });
+        }
+
+        for (int i = 0; i < meteors; i++) {
+            Scheduler.schedule(20 + i * 4, () -> {
+                if (player.isRemoved()) return;
+
+                double a = rng.nextDouble() * Math.PI * 2;
+                double r = Math.sqrt(rng.nextDouble()) * radius;
+                double px = center.x + Math.cos(a) * r;
+                double pz = center.z + Math.sin(a) * r;
+                double sx = px - 18; // meteors streak in diagonally
+                double sz = pz - 10;
+
+                if (!level.hasChunkAt(BlockPos.containing(px, center.y, pz))
+                        || !level.hasChunkAt(BlockPos.containing(sx, center.y, sz))) {
+                    return;
+                }
+                int groundY = level.getHeight(Heightmap.Types.MOTION_BLOCKING, (int) Math.floor(px), (int) Math.floor(pz));
+                int skyY = level.getHeight(Heightmap.Types.MOTION_BLOCKING, (int) Math.floor(sx), (int) Math.floor(sz));
+
+                Vec3 from = new Vec3(sx, Math.max(groundY, skyY) + 26, sz);
+                Vec3 to = new Vec3(px, groundY, pz);
+                Vec3 dir = to.subtract(from).normalize();
+
+                LargeFireball ball = new LargeFireball(level, player, dir.x, dir.y, dir.z, 2);
+                ball.setPos(from.x, from.y, from.z);
+                ball.setDeltaMovement(dir.scale(1.6));
+                level.addFreshEntity(ball);
+                level.playSound(null, from.x, from.y, from.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 3f, 0.6f);
+            });
+        }
         return true;
     }
 

@@ -42,7 +42,8 @@ public enum WeaponType {
             new Mode("timeshift", 1200, StoneAbilities::timeShift),
             new Mode("rewind", 400, StoneAbilities::rewind),
             new Mode("blink", 60, StoneAbilities::realityBlink),
-            new Mode("singularity", 500, StoneAbilities::singularity)));
+            new Mode("singularity", 500, StoneAbilities::singularity),
+            new Mode("meteor", 800, StoneAbilities::meteorShower)));
 
     public record Mode(String id, int cooldown, Ability ability) {
         public MutableComponent name(WeaponType weapon) {

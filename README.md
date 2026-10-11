@@ -56,6 +56,7 @@ Passive while held: immune to fire and explosions, and monsters within 4 blocks 
 | Rewind | 20s | Pulls you back to where you were ~5 seconds ago and restores lost health (it only remembers while you hold the Stone Sword, so hold it a few seconds first) |
 | Reality Blink | 3s | Warps you up to 48 blocks where you look (stops before walls) |
 | Singularity | 25s | Fiery black hole drags everything nearby in for 3s, then detonates |
+| Meteor Shower | 40s | After a short warning ring, 36 fireballs streak down from the sky over about 8 seconds onto a 14-block radius around where you look |
 
 Your own pets, tamed animals, armor stands and team mates are never hit by abilities.
 
