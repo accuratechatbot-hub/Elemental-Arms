@@ -31,7 +31,18 @@ public enum WeaponType {
             new Mode("blast", 30, Abilities::blast),
             new Mode("leap", 80, Abilities::rocketLeap),
             new Mode("shockwave", 120, Abilities::shockwave),
-            new Mode("mark", 100, Abilities::detonationMark)));
+            new Mode("mark", 100, Abilities::detonationMark))),
+
+    STONE_SWORD("stone_sword", ChatFormatting.DARK_PURPLE, () -> Items.STONE_SWORD, List.of(
+            new Mode("grab", 100, StoneAbilities::telekineticGrab),
+            new Mode("push", 60, StoneAbilities::forcePush),
+            new Mode("godblast", 600, StoneAbilities::godBlast),
+            new Mode("nova", 160, StoneAbilities::infernoNova),
+            new Mode("timestop", 900, StoneAbilities::timeStop),
+            new Mode("timeshift", 1200, StoneAbilities::timeShift),
+            new Mode("rewind", 400, StoneAbilities::rewind),
+            new Mode("blink", 60, StoneAbilities::realityBlink),
+            new Mode("singularity", 500, StoneAbilities::singularity)));
 
     public record Mode(String id, int cooldown, Ability ability) {
         public MutableComponent name(WeaponType weapon) {

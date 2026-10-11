@@ -1,6 +1,6 @@
 # Elemental Arms (Minecraft Forge 1.20.1)
 
-Three vanilla items become elemental weapons. No new items, just powers.
+Four vanilla items become elemental weapons (trident, golden axe, iron sword, stone sword). No new items, just powers.
 
 | Weapon | Element | Passive (while held) |
 |---|---|---|
@@ -41,6 +41,21 @@ Three vanilla items become elemental weapons. No new items, just powers.
 | Rocket Leap | 4s | Explosion at your feet launches you where you look (no self damage, no fall damage) |
 | Shockwave Line | 6s | Line of 8 explosions racing across the ground ahead of you |
 | Detonation Mark | 5s | Marks a mob (it glows and is tracked) or a spot; it explodes after 3 seconds |
+
+### Stone Sword - Reality (aggressive fire)
+Passive while held: immune to fire and explosions, and monsters within 4 blocks of you catch fire.
+
+| Mode | Cooldown | What it does |
+|---|---|---|
+| Telekinetic Grab | 5s | Lifts the mob you look at, holds it in front of you for 2.5s, then hurls it; it explodes on impact |
+| Force Push | 3s | Burning shockwave that throws everything in front of you away |
+| God Blast | 30s | Charge for ~1.2s (you are slowed), then a huge hellfire beam (70 blocks) that explodes along its path |
+| Inferno Nova | 8s | Rings of hellfire race outward from you, burning and knocking back everything |
+| Time Stop | 45s | Freezes all mobs and projectiles within 24 blocks for 5s (damage still lands) |
+| Time Shift | 60s | Day becomes midnight, night becomes the next sunrise (Overworld only) |
+| Rewind | 20s | Pulls you back to where you were ~5 seconds ago and restores lost health (it only remembers while you hold the Stone Sword, so hold it a few seconds first) |
+| Reality Blink | 3s | Warps you up to 48 blocks where you look (stops before walls) |
+| Singularity | 25s | Fiery black hole drags everything nearby in for 3s, then detonates |
 
 Your own pets, tamed animals, armor stands and team mates are never hit by abilities.
 

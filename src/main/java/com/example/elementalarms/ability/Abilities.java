@@ -40,15 +40,15 @@ public final class Abilities {
     /* helpers                                                             */
     /* ------------------------------------------------------------------ */
 
-    private static void fail(ServerPlayer player, String key) {
+    static void fail(ServerPlayer player, String key) {
         player.displayClientMessage(Component.translatable("message.elementalarms." + key).withStyle(ChatFormatting.RED), true);
     }
 
-    private static DamageSource attack(ServerLevel level, ServerPlayer player) {
+    static DamageSource attack(ServerLevel level, ServerPlayer player) {
         return level.damageSources().playerAttack(player);
     }
 
-    private static Level.ExplosionInteraction blockInteraction() {
+    static Level.ExplosionInteraction blockInteraction() {
         return Config.BLOCK_DAMAGE.get() ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.NONE;
     }
 
@@ -60,7 +60,7 @@ public final class Abilities {
         level.addFreshEntity(bolt);
     }
 
-    private static void igniteNear(ServerLevel level, ServerPlayer player, Vec3 center, double radius, int attempts) {
+    static void igniteNear(ServerLevel level, ServerPlayer player, Vec3 center, double radius, int attempts) {
         if (!Config.BLOCK_DAMAGE.get()) return;
         RandomSource rng = level.getRandom();
         for (int i = 0; i < attempts; i++) {

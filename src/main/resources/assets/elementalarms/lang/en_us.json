@@ -5,6 +5,7 @@
   "power.elementalarms.trident": "Lightning Powers",
   "power.elementalarms.golden_axe": "Fire Powers",
   "power.elementalarms.iron_sword": "Explosive Powers",
+  "power.elementalarms.stone_sword": "Reality Powers",
 
   "mode.elementalarms.trident.smite": "Smite",
   "mode.elementalarms.trident.chain": "Chain Lightning",
@@ -22,12 +23,23 @@
   "mode.elementalarms.iron_sword.shockwave": "Shockwave Line",
   "mode.elementalarms.iron_sword.mark": "Detonation Mark",
 
+  "mode.elementalarms.stone_sword.grab": "Telekinetic Grab",
+  "mode.elementalarms.stone_sword.push": "Force Push",
+  "mode.elementalarms.stone_sword.godblast": "God Blast",
+  "mode.elementalarms.stone_sword.nova": "Inferno Nova",
+  "mode.elementalarms.stone_sword.timestop": "Time Stop",
+  "mode.elementalarms.stone_sword.timeshift": "Time Shift",
+  "mode.elementalarms.stone_sword.rewind": "Rewind",
+  "mode.elementalarms.stone_sword.blink": "Reality Blink",
+  "mode.elementalarms.stone_sword.singularity": "Singularity",
+
   "tooltip.elementalarms.power": "%s",
   "tooltip.elementalarms.use": "Sneak + Right-click: use the selected ability",
   "tooltip.elementalarms.cycle": "%s: next mode (hold Sneak: previous)",
   "tooltip.elementalarms.passive.trident": "Passive: immune to lightning",
   "tooltip.elementalarms.passive.golden_axe": "Passive: immune to fire and lava",
   "tooltip.elementalarms.passive.iron_sword": "Passive: immune to explosions",
+  "tooltip.elementalarms.passive.stone_sword": "Passive: immune to fire and explosions, sets nearby monsters ablaze",
 
   "message.elementalarms.mode_changed": "Mode: %s",
   "message.elementalarms.cooldown": "%s ready in %ss",
@@ -36,5 +48,12 @@
   "message.elementalarms.storm_called": "You call down a thunderstorm",
   "message.elementalarms.storm_cleared": "The skies clear",
   "message.elementalarms.no_flames": "There are no flames nearby",
-  "message.elementalarms.absorbed": "Absorbed %s flames"
+  "message.elementalarms.absorbed": "Absorbed %s flames",
+  "message.elementalarms.no_time": "Time does not flow here",
+  "message.elementalarms.time_stopped": "Time stops...",
+  "message.elementalarms.time_night": "Time leaps to midnight",
+  "message.elementalarms.time_day": "Time leaps to sunrise",
+  "message.elementalarms.no_rewind": "Nothing to rewind to yet",
+  "message.elementalarms.rewound": "You rewind time",
+  "message.elementalarms.blocked": "Something blocks the way"
 }
