@@ -1,5 +1,6 @@
 package com.example.elementalarms.events;
 
+import com.example.elementalarms.Config;
 import com.example.elementalarms.ElementalArms;
 import com.example.elementalarms.ability.AbilityManager;
 import com.example.elementalarms.ability.Scheduler;
@@ -101,6 +102,7 @@ public final class ForgeEvents {
 
         if (player instanceof ServerPlayer serverPlayer) {
             TimeTracker.record(serverPlayer);
+            updateFlight(serverPlayer);
 
             // Stone Sword aura: monsters close to you catch fire.
             if (serverPlayer.tickCount % 20 == 0 && WeaponType.holds(serverPlayer, WeaponType.STONE_SWORD)) {
@@ -109,6 +111,33 @@ public final class ForgeEvents {
                     e.setSecondsOnFire(4);
                 }
             }
+        }
+    }
+
+    /* ---------------- survival flight while holding any weapon ---------------- */
+
+    private static final String FLIGHT_KEY = "ElementalArmsFlight";
+
+    private static void updateFlight(ServerPlayer player) {
+        if (player.isCreative() || player.isSpectator()) return; // vanilla already handles those
+
+        boolean want = Config.FLIGHT.get() && WeaponType.holdsAny(player);
+        net.minecraft.world.entity.player.Abilities abilities = player.getAbilities();
+        boolean granted = player.getPersistentData().getBoolean(FLIGHT_KEY);
+
+        if (want) {
+            if (!abilities.mayfly) {
+                abilities.mayfly = true;
+                player.getPersistentData().putBoolean(FLIGHT_KEY, true);
+                player.onUpdateAbilities();
+            }
+        } else if (granted) {
+            // only take back flight that this mod granted
+            abilities.mayfly = false;
+            abilities.flying = false;
+            player.getPersistentData().putBoolean(FLIGHT_KEY, false);
+            player.onUpdateAbilities();
+            AbilityManager.grantNoFall(player, 100); // safe landing if you stopped holding it mid-air
         }
     }
 

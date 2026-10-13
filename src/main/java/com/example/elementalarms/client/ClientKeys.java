@@ -13,5 +13,12 @@ public final class ClientKeys {
             GLFW.GLFW_KEY_R,
             "key.categories.elementalarms");
 
+    public static final KeyMapping TOGGLE_ALT = new KeyMapping(
+            "key.elementalarms.toggle_alt",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_V,
+            "key.categories.elementalarms");
+
     private ClientKeys() {}
 }

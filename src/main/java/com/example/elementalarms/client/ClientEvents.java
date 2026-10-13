@@ -5,6 +5,7 @@ import com.example.elementalarms.ability.AbilityManager;
 import com.example.elementalarms.ability.WeaponType;
 import com.example.elementalarms.network.CycleModePacket;
 import com.example.elementalarms.network.ModNetwork;
+import com.example.elementalarms.network.ToggleAltPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -26,10 +27,17 @@ public final class ClientEvents {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
+
         while (ClientKeys.CYCLE.consumeClick()) {
             if (mc.player == null) continue;
             if (WeaponType.fromStack(mc.player.getMainHandItem()) == null) continue;
             ModNetwork.CHANNEL.sendToServer(new CycleModePacket(mc.player.isShiftKeyDown()));
+        }
+
+        while (ClientKeys.TOGGLE_ALT.consumeClick()) {
+            if (mc.player == null) continue;
+            if (WeaponType.fromStack(mc.player.getMainHandItem()) == null) continue;
+            ModNetwork.CHANNEL.sendToServer(new ToggleAltPacket());
         }
     }
 
@@ -39,14 +47,17 @@ public final class ClientEvents {
         WeaponType weapon = WeaponType.fromStack(stack);
         if (weapon == null) return;
 
+        boolean alt = AbilityManager.isAlt(stack);
         int current = AbilityManager.getMode(stack, weapon);
         List<Component> tip = event.getToolTip();
 
         tip.add(Component.empty());
         tip.add(Component.translatable("tooltip.elementalarms.power", Component.translatable(weapon.powerKey()))
                 .withStyle(weapon.color(), ChatFormatting.BOLD));
+        tip.add(Component.translatable(alt ? "tooltip.elementalarms.page_alt" : "tooltip.elementalarms.page_primary")
+                .withStyle(alt ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.YELLOW));
 
-        List<WeaponType.Mode> modes = weapon.modes();
+        List<WeaponType.Mode> modes = AbilityManager.activeModes(stack, weapon);
         for (int i = 0; i < modes.size(); i++) {
             boolean selected = i == current;
             MutableComponent line = Component.literal(selected ? "> " : "  ").append(modes.get(i).name(weapon));
@@ -54,8 +65,11 @@ public final class ClientEvents {
         }
 
         tip.add(Component.translatable(weapon.passiveKey()).withStyle(ChatFormatting.GREEN));
+        tip.add(Component.translatable("tooltip.elementalarms.flight").withStyle(ChatFormatting.GREEN));
         tip.add(Component.translatable("tooltip.elementalarms.use").withStyle(ChatFormatting.GRAY));
         tip.add(Component.translatable("tooltip.elementalarms.cycle", ClientKeys.CYCLE.getTranslatedKeyMessage())
+                .withStyle(ChatFormatting.GRAY));
+        tip.add(Component.translatable("tooltip.elementalarms.toggle_alt", ClientKeys.TOGGLE_ALT.getTranslatedKeyMessage())
                 .withStyle(ChatFormatting.GRAY));
     }
 }

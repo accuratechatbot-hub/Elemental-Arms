@@ -7,7 +7,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "1";
+    private static final String PROTOCOL = "2";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(ElementalArms.MODID, "main"),
@@ -22,6 +22,12 @@ public final class ModNetwork {
                 .encoder(CycleModePacket::encode)
                 .decoder(CycleModePacket::decode)
                 .consumerMainThread(CycleModePacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(ToggleAltPacket.class, 1, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ToggleAltPacket::encode)
+                .decoder(ToggleAltPacket::decode)
+                .consumerMainThread(ToggleAltPacket::handle)
                 .add();
     }
 }

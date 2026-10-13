@@ -12,6 +12,8 @@ Four vanilla items become elemental weapons (trident, golden axe, iron sword, st
 
 - **Sneak + Right-click** with the weapon: use the selected ability (normal right-click still behaves like vanilla, so tridents can still be thrown).
 - **R** (rebindable, "Elemental Arms" category): next mode. Hold **Sneak** while pressing to go to the previous mode.
+- **V** (rebindable): toggle **Alt Mode**. Every weapon has a second page of three abilities; R cycles within whichever page is active, and each page remembers its own selected mode.
+- **Flight:** holding any of the four weapons (either hand) lets you fly in survival (double-tap jump). Put the weapon away and flight ends, with a short safe-landing window. Turn it off with `weaponFlight = false` in the config.
 - Hover the item to see all modes, the selected one (">"), and the passive.
 - The selected mode is stored on the item, so each weapon remembers its own mode.
 
@@ -60,12 +62,30 @@ Passive while held: immune to fire and explosions, and monsters within 4 blocks 
 
 Your own pets, tamed animals, armor stands and team mates are never hit by abilities.
 
+### Alt Mode abilities (press V)
+
+| Weapon | Mode | Cooldown | What it does |
+|---|---|---|---|
+| Trident | Storm Aura | 15s | For 8s, lightning arcs from you into the 3 nearest mobs every half second |
+| Trident | Thunder Clap | 8s | Shockwave: damages, slows and throws back everything within 10 blocks, with 3 real lightning bolts |
+| Trident | Overcharge | 35s | 20s of Speed II, Strength II, Haste II and Resistance |
+| Golden Axe | Magma Wave | 8s | A wave of magma races 24 blocks across the ground in front of you |
+| Golden Axe | Flame Cloak | 25s | 15s of Resistance II and Strength, and anything within 3.5 blocks burns |
+| Golden Axe | Fire Tornado | 20s | A fire tornado rolls forward 20 blocks, pulling in and burning everything |
+| Iron Sword | Cluster Bomb | 10s | 12 explosions scattered around the targeted point |
+| Iron Sword | Ground Slam | 12s | Rocket up, then slam down: a huge explosion where you land |
+| Iron Sword | Chain Reaction | 15s | Marks up to 10 mobs within 16 blocks; they detonate one after another |
+| Stone Sword | Gravity Crush | 20s | Everything within 14 blocks is lifted into the air, then slammed down |
+| Stone Sword | Reality Swap | 6s | Swap places with the mob you look at (and scorch it) |
+| Stone Sword | Time Dilation | 35s | 10s where mobs within 20 blocks crawl and you move at lightning speed |
+
 ## Config (`config/elementalarms-common.toml`)
 
 - `blockDamage` (default `true`): `false` = explosions never break blocks and fire abilities never place fire. Fireballs still follow the `mobGriefing` gamerule.
 - `damageMultiplier` (default `1.0`)
 - `cooldownMultiplier` (default `1.0`, `0` = no cooldowns)
 - `durabilityCost` (default `0`): durability lost per ability use
+- `weaponFlight` (default `true`): survival flight while holding any of the four weapons
 
 ## Building
 

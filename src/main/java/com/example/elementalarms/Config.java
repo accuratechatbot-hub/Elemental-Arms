@@ -22,6 +22,10 @@ public final class Config {
             .comment("Durability the weapon loses each time an ability is used. 0 = free.")
             .defineInRange("durabilityCost", 0, 0, 100);
 
+    public static final ForgeConfigSpec.BooleanValue FLIGHT = BUILDER
+            .comment("If true, survival players can fly while holding any Elemental Arms weapon.")
+            .define("weaponFlight", true);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     private Config() {}

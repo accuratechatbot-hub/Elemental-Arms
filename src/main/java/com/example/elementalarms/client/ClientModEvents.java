@@ -13,5 +13,6 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
         event.register(ClientKeys.CYCLE);
+        event.register(ClientKeys.TOGGLE_ALT);
     }
 }

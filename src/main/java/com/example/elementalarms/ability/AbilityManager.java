@@ -13,26 +13,41 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.List;
 import java.util.Locale;
 
-/** Mode selection, cooldowns and the "use ability" entry point. */
+/** Mode / page selection, cooldowns and the "use ability" entry point. */
 public final class AbilityManager {
-    /** Selected mode is stored on the item itself, so each weapon remembers its own mode. */
+    /** Selected primary mode, stored on the item itself so each weapon remembers its own mode. */
     public static final String MODE_KEY = "ElementalArmsMode";
+    /** Selected mode on the Alt page. */
+    public static final String ALT_MODE_KEY = "ElementalArmsAltMode";
+    /** Whether the weapon is currently on its Alt page. */
+    public static final String ALT_KEY = "ElementalArmsAlt";
     private static final String NOFALL_KEY = "ElementalArmsNoFallUntil";
 
     private AbilityManager() {}
 
-    /* ---------------- mode (stored on the item) ---------------- */
+    /* ---------------- page + mode (stored on the item) ---------------- */
+
+    public static boolean isAlt(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        return tag != null && tag.getBoolean(ALT_KEY);
+    }
+
+    /** The modes of whichever page (primary or Alt) the item is currently on. */
+    public static List<WeaponType.Mode> activeModes(ItemStack stack, WeaponType weapon) {
+        return isAlt(stack) ? weapon.altModes() : weapon.modes();
+    }
 
     public static int getMode(ItemStack stack, WeaponType weapon) {
         CompoundTag tag = stack.getTag();
-        int raw = tag == null ? 0 : tag.getInt(MODE_KEY);
-        return Math.floorMod(raw, weapon.modes().size());
+        int raw = tag == null ? 0 : tag.getInt(isAlt(stack) ? ALT_MODE_KEY : MODE_KEY);
+        return Math.floorMod(raw, activeModes(stack, weapon).size());
     }
 
     public static void setMode(ItemStack stack, int mode) {
-        stack.getOrCreateTag().putInt(MODE_KEY, mode);
+        stack.getOrCreateTag().putInt(isAlt(stack) ? ALT_MODE_KEY : MODE_KEY, mode);
     }
 
     public static void cycleMode(ServerPlayer player, boolean reverse) {
@@ -40,15 +55,32 @@ public final class AbilityManager {
         WeaponType weapon = WeaponType.fromStack(stack);
         if (weapon == null) return;
 
-        int size = weapon.modes().size();
-        int next = Math.floorMod(getMode(stack, weapon) + (reverse ? -1 : 1), size);
+        List<WeaponType.Mode> modes = activeModes(stack, weapon);
+        int next = Math.floorMod(getMode(stack, weapon) + (reverse ? -1 : 1), modes.size());
         setMode(stack, next);
 
         player.displayClientMessage(Component.translatable("message.elementalarms.mode_changed",
-                weapon.modes().get(next).name(weapon)).withStyle(weapon.color()), true);
+                modes.get(next).name(weapon)).withStyle(isAlt(stack) ? ChatFormatting.LIGHT_PURPLE : weapon.color()), true);
         ServerLevel level = player.serverLevel();
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.5f, 1.2f + next * 0.1f);
+    }
+
+    /** Flips the weapon in the main hand between its primary page and its Alt page. */
+    public static void toggleAlt(ServerPlayer player) {
+        ItemStack stack = player.getMainHandItem();
+        WeaponType weapon = WeaponType.fromStack(stack);
+        if (weapon == null) return;
+
+        boolean alt = !isAlt(stack);
+        stack.getOrCreateTag().putBoolean(ALT_KEY, alt);
+
+        WeaponType.Mode current = activeModes(stack, weapon).get(getMode(stack, weapon));
+        player.displayClientMessage(Component.translatable(alt ? "message.elementalarms.alt_on" : "message.elementalarms.alt_off",
+                current.name(weapon)).withStyle(alt ? ChatFormatting.LIGHT_PURPLE : weapon.color()), true);
+        ServerLevel level = player.serverLevel();
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.7f, alt ? 0.6f : 1.6f);
     }
 
     /* ---------------- cooldowns (stored on the player, survive relog + death) ---------------- */
@@ -61,7 +93,7 @@ public final class AbilityManager {
         return root.getCompound(Player.PERSISTED_NBT_TAG);
     }
 
-    /* ---------------- no fall damage window (dash / leap) ---------------- */
+    /* ---------------- no fall damage window (dash / leap / flight ending) ---------------- */
 
     public static void grantNoFall(Player player, int ticks) {
         player.getPersistentData().putLong(NOFALL_KEY, player.level().getGameTime() + ticks);
@@ -75,7 +107,7 @@ public final class AbilityManager {
 
     public static void tryUse(ServerPlayer player, ItemStack stack, WeaponType weapon) {
         int index = getMode(stack, weapon);
-        WeaponType.Mode mode = weapon.modes().get(index);
+        WeaponType.Mode mode = activeModes(stack, weapon).get(index);
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
 
