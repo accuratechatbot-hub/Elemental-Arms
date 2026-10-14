@@ -1,0 +1,226 @@
+package com.example.elementalarms.events;
+
+import com.example.elementalarms.Config;
+import com.example.elementalarms.ElementalArms;
+import com.example.elementalarms.ability.AbilityManager;
+import com.example.elementalarms.ability.Scheduler;
+import com.example.elementalarms.ability.TimeStop;
+import com.example.elementalarms.ability.TimeTracker;
+import com.example.elementalarms.ability.WeaponType;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraft.world.effect.MobEffects;
+import com.example.elementalarms.ability.VoidAbilities;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+
+@Mod.EventBusSubscriber(modid = ElementalArms.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+public final class ForgeEvents {
+    private ForgeEvents() {}
+
+    /* ---------------- ability trigger: Sneak + Right-click ---------------- */
+
+    private static boolean handleUse(Player player, InteractionHand hand, ItemStack stack) {
+        if (hand != InteractionHand.MAIN_HAND || !player.isShiftKeyDown()) return false;
+        WeaponType weapon = WeaponType.fromStack(stack);
+        if (weapon == null) return false;
+        if (player instanceof ServerPlayer serverPlayer) {
+            AbilityManager.tryUse(serverPlayer, stack, weapon);
+        }
+        return true;
+    }
+
+    @SubscribeEvent
+    public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if (handleUse(event.getEntity(), event.getHand(), event.getItemStack())) {
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (handleUse(event.getEntity(), event.getHand(), event.getItemStack())) {
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCanceled(true);
+        }
+    }
+
+    /* ---------------- passive immunities ---------------- */
+
+    private static boolean fireproof(Player player) {
+        return WeaponType.holds(player, WeaponType.GOLDEN_AXE) || WeaponType.holds(player, WeaponType.STONE_SWORD)
+                || WeaponType.holds(player, WeaponType.NETHERITE_SWORD);
+    }
+
+    private static boolean blastproof(Player player) {
+        return WeaponType.holds(player, WeaponType.IRON_SWORD) || WeaponType.holds(player, WeaponType.STONE_SWORD)
+                || WeaponType.holds(player, WeaponType.NETHERITE_SWORD);
+    }
+
+    @SubscribeEvent
+    public static void onAttacked(LivingAttackEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        DamageSource source = event.getSource();
+
+        if (source.is(DamageTypeTags.IS_FIRE) && fireproof(player)) {
+            event.setCanceled(true);
+        } else if (source.is(DamageTypeTags.IS_EXPLOSION) && blastproof(player)) {
+            event.setCanceled(true);
+        } else if (source.is(DamageTypes.LIGHTNING_BOLT) && WeaponType.holds(player, WeaponType.TRIDENT)) {
+            event.setCanceled(true);
+        } else if (WeaponType.holds(player, WeaponType.NETHERITE_SWORD)
+                && (source.is(DamageTypes.WITHER) || source.is(DamageTypes.WITHER_SKULL)
+                || (source.is(DamageTypes.INDIRECT_MAGIC) && source.getEntity() == player))) {
+            event.setCanceled(true);
+        }
+    }
+
+    /** Netherite Sword soul siphon: kills heal the holder. */
+    @SubscribeEvent
+    public static void onDeath(LivingDeathEvent event) {
+        if (event.getEntity().level().isClientSide) return;
+        if (event.getSource().getEntity() instanceof Player killer && WeaponType.holds(killer, WeaponType.NETHERITE_SWORD)
+                && event.getEntity() != killer) {
+            VoidAbilities.siphon(killer, 4f);
+        }
+    }
+
+    /** Raised minions never turn on players. */
+    @SubscribeEvent
+    public static void onChangeTarget(LivingChangeTargetEvent event) {
+        if (event.getNewTarget() instanceof Player && VoidAbilities.isMinion(event.getEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onStruckByLightning(EntityStruckByLightningEvent event) {
+        if (event.getEntity() instanceof Player player && WeaponType.holds(player, WeaponType.TRIDENT)) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END || event.player.level().isClientSide) return;
+        Player player = event.player;
+
+        if (player.isOnFire() && fireproof(player)) {
+            player.clearFire();
+        }
+        if (WeaponType.holds(player, WeaponType.NETHERITE_SWORD) && player.hasEffect(MobEffects.WITHER)) {
+            player.removeEffect(MobEffects.WITHER);
+        }
+
+        if (player instanceof ServerPlayer serverPlayer) {
+            TimeTracker.record(serverPlayer);
+            updateFlight(serverPlayer);
+
+            // Stone Sword aura: monsters close to you catch fire.
+            if (serverPlayer.tickCount % 20 == 0 && WeaponType.holds(serverPlayer, WeaponType.STONE_SWORD)) {
+                for (LivingEntity e : serverPlayer.serverLevel().getEntitiesOfClass(LivingEntity.class,
+                        serverPlayer.getBoundingBox().inflate(4), x -> x instanceof Enemy && x.isAlive())) {
+                    e.setSecondsOnFire(4);
+                }
+            }
+        }
+    }
+
+    /* ---------------- survival flight while holding any weapon ---------------- */
+
+    private static final String FLIGHT_KEY = "ElementalArmsFlight";
+
+    private static void updateFlight(ServerPlayer player) {
+        if (player.isCreative() || player.isSpectator()) return; // vanilla already handles those
+
+        boolean want = Config.FLIGHT.get() && WeaponType.holdsAny(player);
+        net.minecraft.world.entity.player.Abilities abilities = player.getAbilities();
+        boolean granted = player.getPersistentData().getBoolean(FLIGHT_KEY);
+
+        if (want) {
+            if (!abilities.mayfly) {
+                abilities.mayfly = true;
+                if (!player.onGround()) {
+                    abilities.flying = true; // already in the air: start flying instead of falling
+                }
+                player.getPersistentData().putBoolean(FLIGHT_KEY, true);
+                player.onUpdateAbilities();
+                player.displayClientMessage(Component.translatable("message.elementalarms.flight_on")
+                        .withStyle(ChatFormatting.GREEN), true);
+            }
+        } else if (granted) {
+            // only take back flight that this mod granted
+            abilities.mayfly = false;
+            abilities.flying = false;
+            player.getPersistentData().putBoolean(FLIGHT_KEY, false);
+            player.onUpdateAbilities();
+            AbilityManager.grantNoFall(player, 100); // safe landing if you stopped holding it mid-air
+            player.displayClientMessage(Component.translatable("message.elementalarms.flight_off")
+                    .withStyle(ChatFormatting.GRAY), true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        TimeTracker.clear(event.getEntity().getUUID());
+    }
+
+    /** A mob that was frozen when the world saved / its chunk unloaded must not stay frozen forever. */
+    @SubscribeEvent
+    public static void onEntityJoin(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide()) return;
+        if (VoidAbilities.isStaleMinion(event.getEntity())) {
+            event.setCanceled(true);
+            return;
+        }
+        if (TimeStop.hasFreezeTag(event.getEntity()) && !TimeStop.isFrozen(event.getEntity())) {
+            TimeStop.cleanup(event.getEntity());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onFall(LivingFallEvent event) {
+        if (event.getEntity() instanceof Player player && AbilityManager.hasNoFall(player)) {
+            event.setCanceled(true);
+        }
+    }
+
+    /* ---------------- scheduler ---------------- */
+
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            Scheduler.tick();
+            TimeStop.tick();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        VoidAbilities.clearMinions();
+        TimeStop.releaseAll(); // un-freeze any mobs caught in a Time Stop
+        Scheduler.clear();
+        TimeTracker.clearAll();
+    }
+}

@@ -1,0 +1,138 @@
+# Elemental Arms (Minecraft Forge 1.20.1)
+
+Five vanilla items become powered weapons (trident, golden axe, iron sword, stone sword, netherite sword). No new items, just powers.
+
+| Weapon | Element | Passive (while held) |
+|---|---|---|
+| Trident | Lightning | Immune to lightning |
+| Golden Axe | Fire | Immune to fire and lava, you stop burning |
+| Iron Sword | Explosions | Immune to explosion damage |
+
+## Controls
+
+- **Sneak + Right-click** with the weapon: use the selected ability (normal right-click still behaves like vanilla, so tridents can still be thrown).
+- **R** (rebindable, "Elemental Arms" category): next mode. Hold **Sneak** while pressing to go to the previous mode.
+- **V** (rebindable): toggle **Alt Mode**. Every weapon has a second page of three abilities; R cycles within whichever page is active, and each page remembers its own selected mode.
+- **Flight:** holding any of the five weapons (either hand) lets you fly in survival (double-tap jump). Put the weapon away and flight ends, with a short safe-landing window. Turn it off with `weaponFlight = false` in the config.
+- Hover the item to see all modes, the selected one (">"), and the passive.
+- The selected mode is stored on the item, so each weapon remembers its own mode.
+
+## Abilities
+
+### Trident - Lightning
+| Mode | Cooldown | What it does |
+|---|---|---|
+| Smite | 1.5s | Lightning bolt where you look (up to 64 blocks) |
+| Chain Lightning | 3s | Zaps the mob you look at, then arcs to up to 5 more nearby mobs |
+| Thunderstorm | 20s | 14 real lightning bolts rain on the target area over ~3.5s |
+| Lightning Dash | 3s | Dash forward at high speed, shocking everything you pass through (no fall damage) |
+| Weather Control | 60s | Toggles a thunderstorm on/off in the Overworld |
+
+### Golden Axe - Fire
+| Mode | Cooldown | What it does |
+|---|---|---|
+| Fireball | 1.25s | Launches a large fireball |
+| Flame Breath | 2.5s | Cone of flame in front of you; ignites mobs and nearby ground |
+| Fire Pillar | 10s | Column of fire at the target that burns for ~6s |
+| Flame Absorb | 4s | Absorbs fire blocks within 10 blocks (and fire on you/pets) into absorption hearts + a bit of healing |
+
+### Iron Sword - Explosions
+| Mode | Cooldown | What it does |
+|---|---|---|
+| Blast | 1.5s | Explosion exactly where you look |
+| Rocket Leap | 4s | Explosion at your feet launches you where you look (no self damage, no fall damage) |
+| Shockwave Line | 6s | Line of 8 explosions racing across the ground ahead of you |
+| Detonation Mark | 5s | Marks a mob (it glows and is tracked) or a spot; it explodes after 3 seconds |
+
+### Stone Sword - Reality (aggressive fire)
+Passive while held: immune to fire and explosions, and monsters within 4 blocks of you catch fire.
+
+| Mode | Cooldown | What it does |
+|---|---|---|
+| Telekinetic Grab | 5s | Lifts the mob you look at, holds it in front of you for 2.5s, then hurls it; it explodes on impact |
+| Force Push | 3s | Burning shockwave that throws everything in front of you away |
+| God Blast | 30s | Charge for ~1.2s (you are slowed), then a huge hellfire beam (70 blocks) that explodes along its path |
+| Inferno Nova | 8s | Rings of hellfire race outward from you, burning and knocking back everything |
+| Time Stop | 45s | Freezes all mobs and projectiles within 24 blocks for 5s (damage still lands) |
+| Time Shift | 60s | Day becomes midnight, night becomes the next sunrise (Overworld only) |
+| Rewind | 20s | Pulls you back to where you were ~5 seconds ago and restores lost health (it only remembers while you hold the Stone Sword, so hold it a few seconds first) |
+| Reality Blink | 3s | Warps you up to 48 blocks where you look (stops before walls) |
+| Singularity | 25s | Fiery black hole drags everything nearby in for 3s, then detonates |
+| Meteor Shower | 40s | After a short warning ring, 36 fireballs streak down from the sky over about 8 seconds onto a 14-block radius around where you look |
+
+### Netherite Sword - Void (ender, necromancy, reality)
+Passive while held: immune to fire, explosions and wither; every kill heals you 2 hearts.
+
+| Mode | Cooldown | What it does |
+|---|---|---|
+| Rift Step | 2s | Teleport up to 100 blocks where you look |
+| Phase Strike | 5s | Teleport behind the mob you look at and slash it (16 dmg + Wither) |
+| Dragon's Breath | 10s | Volley of 5 dragon fireballs leaving lingering acid |
+| Reality Scatter | 15s | Throws every mob within 24 blocks to random places 12-28 blocks away |
+| Raise Dead | 30s | Summons 8 undead minions (zombies, skeletons, wither skeletons) for 60s; they hunt hostile mobs and never attack players |
+| Soul Drain | 8s | Drains mobs within 14 blocks (7 dmg + Wither) and heals you |
+| **WORLD ENDER** | 4 min | 4s charge with a world-wide warning, then a sphere of void (default 24 blocks) eats the terrain from the center outward while killing everything inside, ending in a huge blast. Aim at the ground ~96 blocks away or less |
+
+Alt Mode (V): **Rift Summon** (15s, yanks every mob within 40 blocks in front of you), **Death Shroud** (35s, resistance, regeneration and a wither aura for 15s), **Void Slash** (10s, 48-block beam that deals 30 damage and bores a tunnel).
+
+Your own pets, tamed animals, armor stands and team mates are never hit by abilities.
+
+### Alt Mode abilities (press V)
+
+| Weapon | Mode | Cooldown | What it does |
+|---|---|---|---|
+| Trident | Storm Aura | 15s | For 8s, lightning arcs from you into the 3 nearest mobs every half second |
+| Trident | Thunder Clap | 8s | Shockwave: damages, slows and throws back everything within 10 blocks, with 3 real lightning bolts |
+| Trident | Overcharge | 35s | 20s of Speed II, Strength II, Haste II and Resistance |
+| Golden Axe | Magma Wave | 8s | A wave of magma races 24 blocks across the ground in front of you |
+| Golden Axe | Flame Cloak | 25s | 15s of Resistance II and Strength, and anything within 3.5 blocks burns |
+| Golden Axe | Fire Tornado | 20s | A fire tornado rolls forward 20 blocks, pulling in and burning everything |
+| Iron Sword | Cluster Bomb | 10s | 12 explosions scattered around the targeted point |
+| Iron Sword | Ground Slam | 12s | Rocket up, then slam down: a huge explosion where you land |
+| Iron Sword | Chain Reaction | 15s | Marks up to 10 mobs within 16 blocks; they detonate one after another |
+| Stone Sword | Gravity Crush | 20s | Everything within 14 blocks is lifted into the air, then slammed down |
+| Stone Sword | Reality Swap | 6s | Swap places with the mob you look at (and scorch it) |
+| Stone Sword | Time Dilation | 35s | 10s where mobs within 20 blocks crawl and you move at lightning speed |
+
+## Config (`config/elementalarms-common.toml`)
+
+- `blockDamage` (default `true`): `false` = explosions never break blocks and fire abilities never place fire. Fireballs still follow the `mobGriefing` gamerule.
+- `damageMultiplier` (default `1.0`)
+- `cooldownMultiplier` (default `1.0`, `0` = no cooldowns)
+- `durabilityCost` (default `0`): durability lost per ability use
+- `weaponFlight` (default `true`): survival flight while holding any of the five weapons
+- `worldEnderRadius` (default `24`, 4-40): size of the World Ender void. Terrain is only destroyed when `blockDamage = true`; mobs still die either way
+
+## Building
+
+Requirements: **JDK 17**.
+
+This project does not ship the Gradle wrapper jar. Easiest way to get it:
+
+1. Download the Forge **1.20.1 MDK** from https://files.minecraftforge.net (any 47.x), and copy its `gradlew`, `gradlew.bat` and `gradle/` folder into this project (or run `gradle wrapper --gradle-version 8.1.1` with a local Gradle).
+2. Run `./gradlew build` (Windows: `gradlew build`).
+3. The mod jar is in `build/libs/elementalarms-1.0.0.jar`. Drop it into the `mods` folder of a Forge 1.20.1 (47.x) install, client and server.
+
+For development: `./gradlew runClient`, or open the folder in IntelliJ / Eclipse as a Gradle project.
+
+The Forge version in `gradle.properties` (`forge_version=47.3.0`) can be changed to any 47.x release.
+
+## Project layout
+
+```
+src/main/java/com/example/elementalarms/
+  ElementalArms.java        mod entry point
+  Config.java               common config
+  ability/
+    WeaponType.java         weapon -> modes table (edit this to rebalance / add modes)
+    Abilities.java          all ability implementations
+    AbilityManager.java     mode storage, cooldowns, use entry point
+    Targeting.java          raycasts + valid target rules
+    Scheduler.java          delayed server tasks
+    Fx.java                 particle helpers
+  events/ForgeEvents.java   sneak+right-click trigger, passives, ticking
+  network/                  "cycle mode" packet
+  client/                   keybind + tooltips
+```
+
+To add a new mode: write a `static boolean myAbility(ServerPlayer, ServerLevel)` in `Abilities`, add a `new Mode("id", cooldownTicks, Abilities::myAbility)` to the weapon in `WeaponType`, and add `mode.elementalarms.<weapon>.<id>` to `en_us.json`.
